@@ -1,0 +1,50 @@
+# ============================================
+# Fintech Sentiment Intelligence — .gitignore
+# ============================================
+
+# --- Virtual Environment ---
+venv/
+.venv/
+env/
+.env
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+*.so
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints/
+
+# --- SQLite Database ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- OS Files ---
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Tableau ---
+*.twbx
+*.hyper
+
+# --- Large Data Files ---
+# Uncomment if CSVs exceed GitHub's 100MB limit:
+# data/raw/*.csv
+# data/clean/*.csv
