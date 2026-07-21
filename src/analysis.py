@@ -1,140 +1,332 @@
 """
-analysis.py — Single source of truth for the Fintech Sentiment Intelligence engine.
-
-Consolidates the VADER sentiment logic and the rule-based Severity Engine that were
-previously duplicated inline across notebooks 03/05/06/07. The labeling sampler,
-the validation notebook, and the Streamlit dashboard all import from here so there
-is zero drift between what the notebooks report and what the dashboard shows.
-
-Usage
------
-    from src.analysis import score_dataframe
-    df = score_dataframe(pd.read_csv("data/clean/all_apps_clean.csv"))
-
-    # or piece by piece:
-    from src.analysis import get_vader_score, vader_label, compute_severity
+Sentiment and Severity Analysis Module
+Centralized scoring logic with negation handling and fintech crisis detection
 """
 
-from __future__ import annotations
-
 import pandas as pd
+import numpy as np
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import re
 
-# ---------------------------------------------------------------------------
-# VADER sentiment
-# ---------------------------------------------------------------------------
-# A single shared analyzer instance (thread-safe for read-only scoring).
-_ANALYZER = SentimentIntensityAnalyzer()
-
-# Thresholds are the VADER-recommended defaults, matching notebook 05.
-VADER_POS_THRESHOLD = 0.05
-VADER_NEG_THRESHOLD = -0.05
+# Initialize VADER
+vader = SentimentIntensityAnalyzer()
 
 
-def get_vader_score(text) -> float:
-    """Return VADER compound score in [-1, 1]. NaN/empty -> 0.0."""
-    if pd.isna(text):
-        return 0.0
-    return _ANALYZER.polarity_scores(str(text))["compound"]
+# ============================================================================
+# NEGATION HANDLING
+# ============================================================================
+
+def handle_negations(text):
+    """
+    Preserve the original review text.
+    VADER has built-in negation handling, so custom NOT_ rewriting is not needed.
+    """
+    return text
 
 
-def vader_label(compound: float) -> str:
-    """Map a VADER compound score to Positive / Neutral / Negative."""
-    if compound >= VADER_POS_THRESHOLD:
-        return "Positive"
-    if compound <= VADER_NEG_THRESHOLD:
-        return "Negative"
-    return "Neutral"
+# ============================================================================
+# FINTECH CRISIS LEXICON
+# ============================================================================
 
-
-def rating_label(rating) -> str:
-    """Map a 1-5 star rating to sentiment tiers (the 'ground truth' proxy)."""
-    if pd.isna(rating):
-        return "Neutral"
-    if rating >= 4:
-        return "Positive"
-    if rating <= 2:
-        return "Negative"
-    return "Neutral"
-
-
-# ---------------------------------------------------------------------------
-# Fintech Severity Engine (rule-based keyword lexicon)
-# ---------------------------------------------------------------------------
-# First match wins, scanning level 5 (Critical) down to 1 (Low). Default = 1.
-SEVERITY_KEYWORDS = {
-    5: ["locked out", "account locked", "account closed", "money missing",
-        "funds missing", "stolen", "fraud", "scam", "cannot access",
-        "lost my money", "money gone", "unauthorized"],
-    4: ["declined", "card declined", "transfer failed", "verification failed",
-        "failed", "frozen", "pending", "verification", "can't send",
-        "can't receive", "not working", "blocked"],
-    3: ["customer service", "support", "refund", "delay", "late",
-        "problem", "issue", "error", "wrong", "charge"],
-    2: ["slow", "bug", "glitch", "annoying", "confusing", "difficult"],
-    1: ["minor", "small", "slight", "okay", "fine"],
+CRISIS_KEYWORDS = {
+    # Account access issues (HIGH severity signals)
+    'account_access': [
+        'locked', 'freeze', 'frozen', 'suspend', 'restricted', 'block', 'blocked',
+        'can\'t access', 'cannot access', 'won\'t load', 'wouldn\'t let',
+        'can\'t log', 'can\'t withdraw', 'can\'t transfer'
+    ],
+    
+    # Fraud and security (CRITICAL severity)
+    'fraud_security': [
+        'hacked', 'fraud', 'scam', 'scammed', 'stolen', 'theft',
+        'unauthorized', 'suspicious', 'dispute', 'disputing'
+    ],
+    
+    # Money issues (HIGH severity)
+    'money_issues': [
+        'lost money', 'missing money', 'disappeared', 'wrong account',
+        'never received', 'didn\'t receive', 'charged twice', 'double charged',
+        'overdraft', 'declined', 'denied', 'rejected', 'bounced'
+    ],
+    
+    # Timing delays (MODERATE-HIGH severity)
+    'timing': [
+        'weeks', 'week', 'days waiting', 'still waiting', 'pending',
+        'hold', 'held', 'delayed', 'slow', 'forever'
+    ],
+    
+    # Critical life impact (CRITICAL severity booster)
+    'life_impact': [
+        'rent', 'bills', 'emergency', 'urgent', 'desperate',
+        'eviction', 'utilities', 'groceries', 'medication'
+    ],
+    
+    # Informal complaint language (severity booster)
+    'informal_negative': [
+        'garbage', 'trash', 'awful', 'terrible', 'horrible',
+        'worst', 'hate', 'hater', 'sucks', 'useless',
+        'joke', 'pathetic', 'ridiculous', 'shady'
+    ]
 }
 
-SEVERITY_MAP = {1: "Low", 2: "Low-Moderate", 3: "Moderate", 4: "High", 5: "Critical"}
 
-# Convenience: ordered labels high -> low for consistent chart/table ordering.
-SEVERITY_ORDER = ["Critical", "High", "Moderate", "Low-Moderate", "Low"]
+def detect_crisis_keywords(text):
+    """
+    Detect fintech crisis keywords and return category matches.
+    Returns dict with categories and their matched keywords.
+    """
+    text_lower = text.lower()
+    matches = {}
+    
+    for category, keywords in CRISIS_KEYWORDS.items():
+        found = []
+        for keyword in keywords:
+            if keyword in text_lower:
+                found.append(keyword)
+        if found:
+            matches[category] = found
+    
+    return matches
 
 
-def compute_severity(text) -> int:
-    """Rule-based severity score 1-5 from complaint keywords. NaN -> 1 (Low)."""
-    if pd.isna(text):
+# ============================================================================
+# SENTIMENT SCORING (with negation handling)
+# ============================================================================
+
+def get_sentiment(text):
+    """
+    Classify sentiment using VADER with negation pre-processing.
+    
+    Returns: 'Positive', 'Negative', or 'Neutral'
+    """
+    if pd.isna(text) or text.strip() == '':
+        return 'Neutral'
+    
+    # Pre-process negations
+    processed_text = handle_negations(text)
+    
+    # Get VADER scores
+    scores = vader.polarity_scores(processed_text)
+    compound = scores['compound']
+    
+    # Classify
+    if compound >= 0.05:
+        return 'Positive'
+    elif compound <= -0.05:
+        return 'Negative'
+    else:
+        return 'Neutral'
+
+
+# ============================================================================
+# SEVERITY SCORING (enhanced with crisis detection)
+# ============================================================================
+
+def calculate_severity(text, sentiment, rating=None):
+    """
+    Calculate severity score (1-5) with crisis keyword boosting.
+    
+    Parameters:
+    - text: review text
+    - sentiment: 'Positive', 'Negative', 'Neutral'
+    - rating: star rating (1-5), optional but recommended
+    
+    Returns: int (1-5)
+    """
+    if pd.isna(text) or text.strip() == '':
         return 1
-    text = str(text).lower()
-    for level in (5, 4, 3, 2, 1):
-        for kw in SEVERITY_KEYWORDS[level]:
-            if kw in text:
-                return level
-    return 1
+    
+    # Process negations for VADER
+    processed_text = handle_negations(text)
+    scores = vader.polarity_scores(processed_text)
+    compound = scores['compound']
+    
+    # Detect crisis keywords
+    crisis_matches = detect_crisis_keywords(text)
+    
+    # Base severity from VADER intensity
+    if sentiment == 'Negative':
+        abs_compound = abs(compound)
+        
+        # Map compound score to base severity
+        if abs_compound >= 0.75:
+            base_severity = 4
+        elif abs_compound >= 0.50:
+            base_severity = 3
+        elif abs_compound >= 0.25:
+            base_severity = 2
+        else:
+            base_severity = 1
+    
+    elif sentiment == 'Positive':
+        # Positive reviews are low severity by default
+        base_severity = 1
+        
+        # But check for hidden negatives (positive words masking complaints)
+        if crisis_matches:
+            base_severity = 3  # Bump up if crisis keywords present
+    
+    else:  # Neutral
+        base_severity = 2
+    
+    # Apply crisis keyword boosters
+    severity_boost = 0
+    
+    # Critical severity boosters
+    if 'fraud_security' in crisis_matches:
+        severity_boost += 2  # Fraud is always critical
+    
+    if 'life_impact' in crisis_matches:
+        severity_boost += 2  # Bills/rent issues are critical
+    
+    # High severity boosters
+    if 'account_access' in crisis_matches:
+        severity_boost += 1
+    
+    if 'money_issues' in crisis_matches:
+        severity_boost += 1
+    
+    # Moderate boosters
+    if 'timing' in crisis_matches:
+        severity_boost += 1
+    
+    if 'informal_negative' in crisis_matches:
+        # Words like "garbage", "shady" indicate strong frustration
+        severity_boost += 1
+    
+    # Calculate final severity
+    final_severity = base_severity + severity_boost
+    
+    # Rating-based fallback (if we have star rating)
+    if rating is not None and rating <= 2 and final_severity < 3:
+        # 1-2 star reviews should be at least moderate severity
+        final_severity = max(final_severity, 3)
+    
+    # Clamp to 1-5 range
+    final_severity = max(1, min(5, final_severity))
+    
+    return final_severity
 
 
-def severity_label(score: int) -> str:
-    """Map a 1-5 severity score to its human label."""
-    return SEVERITY_MAP.get(int(score), "Low")
+SEVERITY_MAP = {
+    1: 'Low',
+    2: 'Moderate',
+    3: 'High',
+    4: 'Severe',
+    5: 'Critical'
+}
 
 
-# ---------------------------------------------------------------------------
-# One-call scoring
-# ---------------------------------------------------------------------------
-def score_dataframe(df: pd.DataFrame, text_col: str = "review_clean",
-                    rating_col: str = "rating") -> pd.DataFrame:
+def get_severity_label(severity_score):
+    """Map numeric severity to label"""
+    return SEVERITY_MAP.get(severity_score, 'Unknown')
+
+
+# ============================================================================
+# HIDDEN NEGATIVE DETECTION
+# ============================================================================
+
+def is_hidden_negative(sentiment, severity_score, rating=None):
     """
-    Add all derived scoring columns in one pass. Returns a copy.
-
-    Adds:
-        vader_compound, vader_sentiment, rating_sentiment,
-        severity_score, severity_label, is_hidden_negative, is_high_severity
+    Detect hidden negatives: reviews that appear positive/neutral 
+    but contain serious complaints.
+    
+    Returns: bool
     """
-    out = df.copy()
-    out["vader_compound"] = out[text_col].apply(get_vader_score)
-    out["vader_sentiment"] = out["vader_compound"].apply(vader_label)
-    out["rating_sentiment"] = out[rating_col].apply(rating_label)
-    out["severity_score"] = out[text_col].apply(compute_severity)
-    out["severity_label"] = out["severity_score"].map(SEVERITY_MAP)
-
-    # A "hidden negative" = truly negative (by rating) but VADER did NOT flag it.
-    out["is_hidden_negative"] = (
-        (out["rating_sentiment"] == "Negative") &
-        (out["vader_sentiment"] != "Negative")
-    )
-    # Binary high-severity detector — the framing the $2-4M business case rests on.
-    out["is_high_severity"] = out["severity_score"] >= 4
-    return out
+    # Positive/neutral sentiment but high severity
+    if sentiment in ['Positive', 'Neutral'] and severity_score >= 4:
+        return True
+    
+    # High rating but critical severity (rating-text mismatch)
+    if rating is not None and rating >= 4 and severity_score >= 4:
+        return True
+    
+    return False
 
 
-if __name__ == "__main__":
-    # Smoke test / CLI: score the clean dataset and print a summary.
-    import os
-    here = os.path.dirname(os.path.abspath(__file__))
-    csv = os.path.join(here, "..", "data", "clean", "all_apps_clean.csv")
-    df = score_dataframe(pd.read_csv(csv))
-    print(f"Scored {len(df):,} reviews")
-    print("\nSeverity distribution:")
-    print(df["severity_label"].value_counts().reindex(SEVERITY_ORDER))
-    print("\nHidden negatives:", int(df["is_hidden_negative"].sum()))
-    print("High-severity reviews:", int(df["is_high_severity"].sum()))
+# ============================================================================
+# FULL ANALYSIS PIPELINE
+# ============================================================================
+
+def analyze_review(text, rating=None):
+    """
+    Complete analysis pipeline for a single review.
+    
+    Parameters:
+    - text: review text (str)
+    - rating: star rating 1-5 (int, optional)
+    
+    Returns: dict with all analysis results
+    """
+    sentiment = get_sentiment(text)
+    severity_score = calculate_severity(text, sentiment, rating)
+    severity_label = get_severity_label(severity_score)
+    hidden_negative = is_hidden_negative(sentiment, severity_score, rating)
+    
+    return {
+        'sentiment': sentiment,
+        'severity_score': severity_score,
+        'severity_label': severity_label,
+        'is_hidden_negative': hidden_negative
+    }
+
+
+def analyze_dataframe(df, text_col='review_text', rating_col='rating'):
+    """
+    Apply analysis to entire DataFrame.
+    
+    Parameters:
+    - df: pandas DataFrame
+    - text_col: name of column containing review text
+    - rating_col: name of column containing star rating (optional)
+    
+    Returns: DataFrame with analysis columns added
+    """
+    df = df.copy()
+    
+    # Check if rating column exists
+    has_rating = rating_col in df.columns
+    
+    # Apply analysis
+    if has_rating:
+        results = df.apply(
+            lambda row: analyze_review(row[text_col], row[rating_col]), 
+            axis=1
+        )
+    else:
+        results = df[text_col].apply(lambda text: analyze_review(text))
+    
+    # Unpack results into separate columns
+    df['vader_sentiment'] = results.apply(lambda x: x['sentiment'])
+    df['severity_score'] = results.apply(lambda x: x['severity_score'])
+    df['severity_label'] = results.apply(lambda x: x['severity_label'])
+    df['is_hidden_negative'] = results.apply(lambda x: x['is_hidden_negative'])
+    
+    return df
+
+
+# ============================================================================
+# EXAMPLE USAGE
+# ============================================================================
+
+if __name__ == '__main__':
+    # Test examples
+    test_cases = [
+        ("not good at all", 1),
+        ("can't access my money for weeks", 1),
+        ("Great app but my account got hacked", 5),
+        ("Love it!", 5),
+        ("garbage app, shady practices", 1),
+    ]
+    
+    print("Testing improved sentiment engine:\n")
+    print("=" * 80)
+    
+    for text, rating in test_cases:
+        result = analyze_review(text, rating)
+        print(f"\nText: {text}")
+        print(f"Rating: {rating}★")
+        print(f"Sentiment: {result['sentiment']}")
+        print(f"Severity: {result['severity_score']} ({result['severity_label']})")
+        print(f"Hidden Negative: {result['is_hidden_negative']}")
+        print("-" * 80)

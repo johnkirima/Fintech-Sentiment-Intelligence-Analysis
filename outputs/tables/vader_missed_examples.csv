@@ -1,0 +1,11 @@
+app_name,rating,pred_sentiment,true_severity,review_text
+Cash App,3,Positive,4,Very useful app as long as I was sending money from my bank account. But I'm pretty sure my credit card number got stolen when I used that instead of my bank account.
+Venmo,2,Positive,4,Usually didn't require help but when needed help is hard to get
+Chime,1,Neutral,5,"Automatically installed itself onto my phone after an update. Shady behavior from a ""banking"" app. I wouldn't trust them with a dollar."
+Chime,1,Neutral,5,Chime did not explain anything to me at all and told me that I couldn't do it.
+Venmo,3,Positive,4,"sometime transactions go smoothly, sometimes they seem to disappear as if they never happened. frustrating!"
+Venmo,1,Positive,5,"Adding money to your account, they take it out of your bank account the next day and then keep your money for 10 days after the transfer. cash app is much better. your funds are available right away and they don't hold your .money for over a week!"
+Venmo,1,Positive,4,This app was not working. It refused to display its own pages correctly both in the app and online. The small a verification deposits never came.
+Chime,3,Positive,3,why when I change my virtual number old charges from companies still come though trying to charge things I cancelled I have to keep it frozen all the time I never had this happen with any other bank. Let me say I do love chime except for that.
+PayPal,2,Neutral,4,Too much fees!
+PayPal,3,Positive,2,PayPal is Good application but after Linking my verify Paypal account to my paga I wasn't able to receive funds in Nigeria even though it says I will be able to Receive funds after Linking it to paga but seems like it not working🤔
