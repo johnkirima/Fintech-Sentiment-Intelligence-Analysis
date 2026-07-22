@@ -1,6 +1,6 @@
 # 💰 Fintech Sentiment Intelligence Analysis
 
-**AI-Powered Customer Review Analysis for 5 Major Fintech Apps**
+**AI-Powered Customer Review Analysis for 4 Major Fintech Apps**
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
@@ -10,7 +10,7 @@
 
 ## 📊 Project Overview
 
-This project analyzes **25,000+ customer reviews** from 5 leading fintech apps (Chime, Cash App, Venmo, PayPal, Zelle) using advanced NLP and sentiment analysis to uncover hidden pain points, crisis language patterns, and competitive intelligence.
+This project analyzes **10,386 customer reviews** from 4 leading fintech apps (Cash App, Chime, PayPal, Venmo) using advanced NLP and sentiment analysis to uncover hidden pain points, crisis language patterns, and competitive intelligence.
 
 ### 🎯 Business Impact
 
@@ -40,9 +40,8 @@ This project analyzes **25,000+ customer reviews** from 5 leading fintech apps (
 ## 📈 Key Findings
 
 ### Sentiment Distribution
-- **Positive**: 68.4% of reviews
-- **Negative**: 21.3% of reviews  
-- **Neutral**: 10.3% of reviews
+- **Negative**: 30.6% of reviews (3,177 reviews)
+- **Neutral/Positive**: 69.4% of reviews
 
 ### Crisis Patterns Detected
 1. **Account Access Issues** (35% of high-severity complaints)
@@ -54,17 +53,17 @@ This project analyzes **25,000+ customer reviews** from 5 leading fintech apps (
 
 ### App Comparison Highlights
 - **Highest Rated**: Cash App (4.07★)
-- **Most Negative Sentiment**: Venmo (28.2%)
-- **Most Hidden Negatives**: Chime (229 reviews)
+- **Lowest Rated**: Venmo (3.31★)
+- **Data**: 2,600 reviews per app (10,386 total)
 
 ---
 
 ## 🛠️ Technical Stack
 
 ### Data Collection & Processing
-- **Web Scraping**: BeautifulSoup, Selenium
+- **Web Scraping**: google-play-scraper
 - **Data Cleaning**: Pandas, NumPy, Regex
-- **Storage**: CSV (25,000+ reviews, ~15MB)
+- **Storage**: CSV (10,386 reviews)
 
 ### NLP & Machine Learning
 - **Sentiment Analysis**: VADER (vaderSentiment)
@@ -150,9 +149,10 @@ Dashboard opens at `http://localhost:8501`
 ## 🔬 Methodology
 
 ### Phase 1: Data Collection
-- Scraped 25,000+ reviews from Google Play Store
-- Collected: review text, rating, date, app name
-- Cleaned: removed duplicates, normalized text
+- Scraped 10,400 reviews from Google Play Store (2,600 per app)
+- Apps: Cash App, Chime, PayPal, Venmo
+- Collected: review text, rating, date, app name, user name
+- Cleaned: removed 14 duplicates, normalized text → 10,386 final reviews
 
 ### Phase 2: Sentiment Engine Development
 - Built VADER-based sentiment classifier

@@ -2,15 +2,15 @@
 ## Executive Summary
 
 **Project Duration**: 2 weeks  
-**Dataset**: 25,000+ customer reviews  
-**Apps Analyzed**: Chime, Cash App, Venmo, PayPal, Zelle  
+**Dataset**: 10,386 customer reviews  
+**Apps Analyzed**: Cash App, Chime, PayPal, Venmo  
 **Author**: John Kirima
 
 ---
 
 ## 🎯 Objective
 
-Analyze customer sentiment across 5 major fintech apps to:
+Analyze customer sentiment across 4 major fintech apps to:
 1. Identify hidden pain points and crisis language patterns
 2. Build an AI-powered severity detection system
 3. Provide competitive intelligence and actionable insights
@@ -50,23 +50,22 @@ Analyze customer sentiment across 5 major fintech apps to:
 
 ### 3. Competitive Landscape
 
-| App | Avg Rating | Negative % | Avg Severity | Hidden Neg |
-|-----|-----------|-----------|--------------|------------|
-| Cash App | 4.07★ | 14.6% | 1.77 | 137 |
-| Chime | 3.89★ | 18.4% | 1.97 | 229 |
-| PayPal | 3.43★ | 25.0% | 2.15 | 156 |
-| Venmo | 3.31★ | 28.2% | 2.25 | 185 |
-| Zelle | 3.28★ | 26.8% | 2.18 | 142 |
+| App | Avg Rating | Reviews Analyzed | Negative Reviews |
+|-----|-----------|------------------|------------------|
+| Cash App | 4.07★ | 2,600 | ~30% |
+| Chime | 3.89★ | 2,595 | ~30% |
+| PayPal | 3.43★ | 2,594 | ~30% |
+| Venmo | 3.31★ | 2,597 | ~30% |
 
-**Insight**: Cash App leads in customer satisfaction; Venmo has highest complaint rate
+**Insight**: Cash App leads in customer satisfaction (4.07★); Venmo has lowest rating (3.31★). Dataset: 10,386 total reviews with 30.6% negative (rating ≤ 2)
 
 ---
 
 ## 🛠️ Technical Approach
 
 ### Data Pipeline
-1. **Scraped 25,000+ reviews** from Google Play Store
-2. **Cleaned & normalized** text (removed duplicates, fixed encoding)
+1. **Scraped 10,400 reviews** from Google Play Store (2,600 per app)
+2. **Cleaned & normalized** text (removed 14 duplicates, fixed encoding) → 10,386 final
 3. **Built sentiment engine** using VADER with custom enhancements
 4. **Validated model** on 200 hand-labeled reviews
 
