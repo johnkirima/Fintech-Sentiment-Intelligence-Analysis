@@ -1,275 +1,251 @@
-<div align="center">
+# 💰 Fintech Sentiment Intelligence Analysis
 
-# Fintech Sentiment Intelligence
+**AI-Powered Customer Review Analysis for 5 Major Fintech Apps**
 
-### Competitive Analytics Case Study — Why Venmo Is Bleeding Users and How to Fix It
-
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
-[![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?style=flat&logo=jupyter&logoColor=white)](https://jupyter.org)
-[![pandas](https://img.shields.io/badge/pandas-2.0+-150458?style=flat&logo=pandas&logoColor=white)](https://pandas.pydata.org)
-[![NLTK](https://img.shields.io/badge/NLTK-VADER-154f3c?style=flat&logo=python&logoColor=white)](https://www.nltk.org)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-LDA-F7931E?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
-[![Matplotlib](https://img.shields.io/badge/Matplotlib-Seaborn-11557c?style=flat&logo=plotly&logoColor=white)](https://matplotlib.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-**[🔗 View Live Case Study](https://sentiment.johnkirima.com/)** · **[📊 Explore the Data](#visual-results)** · **[📁 Repository Structure](#repository-structure)**
-
-</div>
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## Table of Contents
+## 📊 Project Overview
 
-- [Project Overview](#-project-overview)
-- [Key Findings](#-key-findings)
-- [Visual Results](#-visual-results)
-- [Methodology](#-methodology)
-- [Tech Stack](#-tech-stack)
-- [Repository Structure](#-repository-structure)
-- [How to Run](#-how-to-run)
-- [Results & Deliverables](#-results--deliverables)
-- [Business Impact](#-business-impact)
-- [Author](#-author)
-- [License](#-license)
+This project analyzes **25,000+ customer reviews** from 5 leading fintech apps (Chime, Cash App, Venmo, PayPal, Zelle) using advanced NLP and sentiment analysis to uncover hidden pain points, crisis language patterns, and competitive intelligence.
+
+### 🎯 Business Impact
+
+- **Improved Severity Detection**: Enhanced model accuracy by **87%** (macro-F1: 0.16 → 0.30)
+- **Hidden Negative Detection**: Identified **707 complaints** disguised as positive reviews
+- **Crisis Keywords**: Built fintech-specific lexicon detecting fraud, account access, and money issues
+- **Actionable Insights**: Provided competitive benchmarking across 5 major apps
 
 ---
 
-## 📋 Project Overview
+## 🚀 Key Features
 
-### The Business Problem
+### 🤖 Advanced NLP Pipeline
+- **Sentiment Classification**: VADER with custom negation handling
+- **Severity Scoring**: 1-5 scale rating issue urgency
+- **Crisis Detection**: Fintech-specific keyword lexicon (fraud, frozen accounts, lost funds)
+- **Hidden Negative Finder**: Identifies complaints in polite language
 
-In fintech, **every 0.1-star drop in app store rating costs roughly $500K–$1M in lost installs per year**. When Venmo's negative review rate hit **40.2%** — double that of competitor Cash App — something was clearly broken. But the product team didn't know *what*, *where*, or *how much* it was costing.
-
-Traditional analytics dashboards track *ratings*. They don't explain *why* users are angry. And standard NLP tools like VADER miss **26% of critical complaints** — the sarcastic, technical, and financial-jargon-heavy reviews that carry the most operational signal.
-
-### What This Project Does
-
-This project reverse-engineers the competitive gap between four major fintech apps by analyzing **10,386 real Google Play Store reviews** using a multi-phase NLP pipeline:
-
-1. **Scrapes and cleans** real user reviews from Cash App, Venmo, Chime, and PayPal
-2. **Scores sentiment** using VADER, then validates against star ratings to expose where rule-based NLP fails
-3. **Clusters complaints** into actionable topic groups using LDA topic modeling
-4. **Quantifies the revenue impact** of each failure mode to prioritize product fixes
-
-The result: a prioritized list of product recommendations with an estimated **$2–4M annual revenue recovery opportunity**.
+### 📊 Interactive Dashboard
+- **4 Analytical Pages**: Overview, App Comparison, Crisis Detection, Topic Insights
+- **Real-time Filtering**: Filter by app, sentiment, severity, rating
+- **Visual Analytics**: 15+ interactive charts and heatmaps
+- **Export Capabilities**: Download filtered datasets
 
 ---
 
-## 🎯 Key Findings
+## 📈 Key Findings
 
-| Finding | Impact |
-|---|---|
-| **Venmo's negative review rate is 2× Cash App's** | 40.2% vs. 20.0% — Venmo has a structural UX/trust problem, not just bad luck |
-| **26% of critical complaints are invisible to VADER** | Rule-based sentiment analysis misclassifies sarcasm, financial jargon, and multi-issue reviews |
-| **VADER achieves only 59% recall on negative reviews** | 4 out of 10 angry users are being ignored in any VADER-based monitoring pipeline |
-| **Negative reviews are 2.5× longer than positive ones** | Angry users write detailed complaints — these are the highest-signal reviews and they're being missed |
-| **$2–4M in annual revenue is recoverable** | Fixing the top 3 complaint clusters could recover 0.3 stars and prevent thousands of churned installs |
+### Sentiment Distribution
+- **Positive**: 68.4% of reviews
+- **Negative**: 21.3% of reviews  
+- **Neutral**: 10.3% of reviews
+
+### Crisis Patterns Detected
+1. **Account Access Issues** (35% of high-severity complaints)
+   - Keywords: "locked", "frozen", "can't access", "suspended"
+2. **Money/Payment Problems** (28%)
+   - Keywords: "money", "funds", "payment", "transfer", "missing", "lost"
+3. **Fraud & Security** (18%)
+   - Keywords: "fraud", "scam", "hacked", "stolen", "unauthorized"
+
+### App Comparison Highlights
+- **Highest Rated**: Cash App (4.07★)
+- **Most Negative Sentiment**: Venmo (28.2%)
+- **Most Hidden Negatives**: Chime (229 reviews)
 
 ---
 
-## 📊 Visual Results
+## 🛠️ Technical Stack
 
-### Rating Distribution Across Apps
-> Venmo and PayPal show significantly heavier tails in the 1–2 star range compared to Cash App and Chime.
+### Data Collection & Processing
+- **Web Scraping**: BeautifulSoup, Selenium
+- **Data Cleaning**: Pandas, NumPy, Regex
+- **Storage**: CSV (25,000+ reviews, ~15MB)
 
-![Rating Distribution](outputs/charts/rating_distribution.png)
+### NLP & Machine Learning
+- **Sentiment Analysis**: VADER (vaderSentiment)
+- **Text Processing**: NLTK, spaCy
+- **Topic Modeling**: Scikit-learn TfidfVectorizer
+- **Validation**: 200 hand-labeled reviews
 
-### Per-App Rating Breakdown
-> Cash App maintains a healthier distribution with 60%+ positive reviews, while Venmo's distribution is nearly inverted.
+### Visualization & Dashboard
+- **Dashboard**: Streamlit
+- **Charts**: Plotly, Matplotlib, Seaborn
+- **Deployment**: Streamlit Cloud (optional)
 
-![Rating Distribution Per App](outputs/charts/rating_distribution_per_app.png)
+---
 
-### Negative Review Trends Over Time
-> Weekly negative review volume reveals spikes that correlate with app updates and service incidents.
+## 📁 Project Structure
 
-![Negative Reviews Weekly](outputs/charts/negative_reviews_weekly.png)
+```
+Fintech-Sentiment-Intelligence-Analysis/
+├── data/
+│   ├── raw/              # Original scraped reviews
+│   ├── clean/            # Cleaned & processed data
+│   └── labels/           # Hand-labeled validation set (200 reviews)
+├── notebooks/
+│   ├── 01_scraping.ipynb
+│   ├── 03_sentiment_nlp.ipynb
+│   ├── 04_Evaluation + mismatch analysis.ipynb
+│   ├── 10_validation_metrics.ipynb
+│   └── 11_error_analysis.ipynb
+├── src/
+│   └── analysis.py       # Core sentiment + severity engine
+├── dashboard/
+│   ├── app.py            # Main dashboard
+│   ├── utils.py          # Shared utilities
+│   └── pages/            # 4 dashboard pages
+├── outputs/
+│   ├── charts/           # Generated visualizations
+│   └── tables/           # Validation metrics
+├── docs/
+│   ├── Executive_Summary.pdf
+│   └── phase1_implementation_plan.pdf
+├── screenshots/          # Dashboard screenshots
+└── README.md
+```
 
-### Top Complaint Themes by App (Negative Bigrams)
-> "Customer service," "bank account," and "direct deposit" dominate — these are operational failures, not cosmetic complaints.
+---
 
-![Top Bigrams Negative Per App](outputs/charts/top_bigrams_negative_per_app.png)
+## 🚀 Quick Start
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/johnkirima/Fintech-Sentiment-Intelligence-Analysis.git
+cd Fintech-Sentiment-Intelligence-Analysis
+```
+
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run Dashboard
+```bash
+cd dashboard
+streamlit run app.py
+```
+
+Dashboard opens at `http://localhost:8501`
+
+---
+
+## 📊 Dashboard Screenshots
+
+### Main Overview
+![Dashboard Overview](screenshots/dashboard_overview.png)
+
+### App Comparison
+![App Comparison](screenshots/app_comparison.png)
+
+### About the Dashboard
+![About Section](screenshots/about_section.png)
 
 ---
 
 ## 🔬 Methodology
 
-### Phase 1 — Data Acquisition & EDA
-- Scraped **10,386 unique reviews** from the Google Play Store using `google-play-scraper`
-- Cleaned and deduplicated the dataset (removed 13 duplicates, handled missing values)
-- Engineered features: `review_length`, `is_negative`, `rating_tier`, `year_month`, `day_of_week`
-- Generated **12 publication-quality visualizations** for exploratory analysis
+### Phase 1: Data Collection
+- Scraped 25,000+ reviews from Google Play Store
+- Collected: review text, rating, date, app name
+- Cleaned: removed duplicates, normalized text
 
-> **Notebook:** [`01_scraping.ipynb`](notebooks/01_scraping.ipynb) → [`02_eda.ipynb`](notebooks/02_eda.ipynb)
+### Phase 2: Sentiment Engine Development
+- Built VADER-based sentiment classifier
+- Added negation handling (38% error reduction)
+- Created severity scoring algorithm (1-5 scale)
+- Developed fintech crisis keyword lexicon
 
-### Phase 2 — Sentiment Analysis & Validation
-- Applied **VADER (Valence Aware Dictionary and sEntiment Reasoner)** to score every review
-- Validated VADER compound scores against actual star ratings to build a confusion matrix
-- Identified systematic failure modes: sarcasm, financial jargon, multi-issue complaints
-- Found that **26% of 1-star reviews are classified as neutral/positive by VADER** — a critical blind spot
+### Phase 3: Validation
+- Hand-labeled 200 reviews for ground truth
+- Achieved:
+  - Sentiment accuracy: **67%**
+  - Severity macro-F1: **0.30** (+87% improvement)
+  - High-severity F1: **0.55**
 
-> **Notebook:** [`03_sentiment_nlp.ipynb`](notebooks/03_sentiment_nlp.ipynb)
-
-### Phase 3 — Topic Modeling & Competitive Analysis
-- Used **Latent Dirichlet Allocation (LDA)** to cluster complaints into actionable topic groups
-- Mapped topics across apps to identify which issues are Venmo-specific vs. industry-wide
-- Scored each topic by severity (average rating) and volume to prioritize fixes
-- Estimated revenue impact per topic cluster using app store conversion benchmarks
-
-> **Notebook:** [`03_sentiment_nlp.ipynb`](notebooks/03_sentiment_nlp.ipynb)
-
----
-
-## 🛠 Tech Stack
-
-| Category | Tools |
-|---|---|
-| **Language** | Python 3.10+ |
-| **Data Collection** | `google-play-scraper` (Google Play Store API) |
-| **Data Processing** | pandas, NumPy |
-| **NLP & Sentiment** | NLTK (VADER), scikit-learn (LDA, TF-IDF) |
-| **Visualization** | Matplotlib, Seaborn |
-| **Notebooks** | Jupyter Notebook |
-| **Version Control** | Git, GitHub |
-| **Deployment** | Azure Static Web Apps (CI/CD via GitHub Actions) |
-| **Showcase Site** | [Lovable](https://lovable.dev) (React + TypeScript) |
+### Phase 4: Dashboard & Insights
+- Built 4-page interactive Streamlit dashboard
+- Generated competitive intelligence reports
+- Identified hidden negatives and crisis patterns
 
 ---
 
-## 📁 Repository Structure
+## 📈 Model Performance
 
-```
-Fintech-Sentiment-Intelligence-Analysis/
-├── data/
-│   ├── raw/                          # Scraped Google Play reviews (10,400 total)
-│   │   ├── fintech_reviews_raw.csv   #   Master combined dataset
-│   │   ├── cashapp_raw.csv           #   Cash App reviews (2,600)
-│   │   ├── venmo_raw.csv             #   Venmo reviews (2,600)
-│   │   ├── chime_raw.csv             #   Chime reviews (2,600)
-│   │   ├── paypal_raw.csv            #   PayPal reviews (2,600)
-│   │   └── scrape_metadata.csv       #   Scraping run metadata
-│   └── clean/                        # Cleaned & feature-engineered data
-│       ├── all_apps_clean.csv        #   Full cleaned dataset (10,386 reviews)
-│       └── negative_reviews.csv      #   Negative subset (3,177 reviews)
-│
-├── notebooks/
-│   ├── 01_scraping.ipynb             # Data acquisition pipeline
-│   ├── 02_eda.ipynb                  # Exploratory analysis & feature engineering
-│   └── 03_sentiment_nlp.ipynb        # VADER sentiment + LDA topic modeling
-│
-├── outputs/
-│   ├── charts/                       # 12+ publication-quality visualizations
-│   │   ├── rating_distribution.png
-│   │   ├── rating_distribution_per_app.png
-│   │   ├── negative_reviews_weekly.png
-│   │   ├── top_bigrams_negative_per_app.png
-│   │   ├── avg_rating_by_app.png
-│   │   ├── review_volume_weekly.png
-│   │   └── ...
-│   ├── exports/                      # Model artifacts & data exports
-│   └── tables/                       # Summary statistics tables
-│
-├── docs/                             # Project documentation
-├── sql/                              # SQL scripts (if applicable)
-├── requirements.txt                  # Python dependencies
-├── README.md                         # ← You are here
-└── LICENSE
-```
+### Sentiment Classification
+| Metric | Score |
+|--------|-------|
+| Accuracy | 67.0% |
+| Negative Recall | 64.0% |
+| Negation Error Rate | 36.0% |
+
+### Severity Detection
+| Metric | Score |
+|--------|-------|
+| Macro-F1 | 0.30 |
+| Weighted-F1 | 0.32 |
+| High-Severity F1 | 0.55 |
+| Cohen's Kappa | 0.15 |
 
 ---
 
-## 🚀 How to Run
+## 🎯 Business Applications
 
-### Prerequisites
-- Python 3.10+
-- pip or conda
+### For Product Teams
+- **Prioritize fixes** based on severity scores
+- **Track sentiment trends** over time
+- **Compare** against competitors
 
-### Setup
+### For Customer Support
+- **Flag critical issues** automatically
+- **Identify hidden complaints** in positive reviews
+- **Route high-severity** cases faster
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/johnkirima/Fintech-Sentiment-Intelligence-Analysis.git
-cd Fintech-Sentiment-Intelligence-Analysis
-
-# 2. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate          # macOS/Linux
-# venv\Scripts\activate           # Windows
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Launch Jupyter
-jupyter notebook
-```
-
-### Notebook Execution Order
-
-| Order | Notebook | Purpose | Runtime |
-|---|---|---|---|
-| 1 | `01_scraping.ipynb` | Scrape Google Play reviews | ~5 min |
-| 2 | `02_eda.ipynb` | Clean data, generate charts | ~2 min |
-| 3 | `03_sentiment_nlp.ipynb` | VADER scoring, topic modeling | ~3 min |
-
-> **Note:** The `data/` directory already contains pre-scraped data. You can skip notebook 01 and start directly from 02 if you just want to explore the analysis.
+### For Marketing
+- **Benchmark** against competitors
+- **Understand** customer pain points
+- **Craft messaging** addressing concerns
 
 ---
 
-## 📦 Results & Deliverables
+## 🔮 Future Enhancements
 
-| Deliverable | Description | Link |
-|---|---|---|
-| **Live Case Study** | Interactive showcase site with methodology, findings, and visualizations | [sentiment.johnkirima.com](https://sentiment.johnkirima.com/) |
-| **Scraping Pipeline** | Reproducible Google Play review collection for any app | [`01_scraping.ipynb`](notebooks/01_scraping.ipynb) |
-| **EDA & Feature Engineering** | 12 charts + cleaned dataset with 6 engineered features | [`02_eda.ipynb`](notebooks/02_eda.ipynb) |
-| **NLP Analysis** | VADER validation + LDA topic clustering + competitive gap analysis | [`03_sentiment_nlp.ipynb`](notebooks/03_sentiment_nlp.ipynb) |
-| **Clean Dataset** | 10,386 reviews with sentiment scores and topic labels | [`data/clean/all_apps_clean.csv`](data/clean/all_apps_clean.csv) |
-
----
-
-## 💰 Business Impact
-
-### The Bottom Line
-
-This analysis provides **3 actionable product recommendations** based on data, not intuition:
-
-1. **Fix account access and login flows** — the #1 complaint cluster across all four apps, but especially severe for Venmo
-2. **Rebuild customer support escalation paths** — "customer service" is the top negative bigram for 3 out of 4 apps
-3. **Improve transaction reliability messaging** — failed/delayed transfers generate the most emotionally charged reviews
-
-### Revenue Recovery Estimate
-
-| Metric | Value |
-|---|---|
-| Reviews analyzed | **10,386** |
-| Apps benchmarked | **4** (Cash App, Venmo, Chime, PayPal) |
-| Critical complaints missed by VADER | **26%** |
-| Estimated rating recovery | **+0.3 stars** |
-| Estimated annual revenue impact | **$2–4M** in recovered installs |
-
-### Why This Matters for Product Teams
-
-Traditional sentiment monitoring (VADER, TextBlob) gives product teams a **false sense of security**. When 26% of your most critical complaints are classified as "neutral," you're making roadmap decisions with incomplete data. This project demonstrates a methodology for closing that gap.
-
----
-
-## 👤 Author
-
-**John Kirima**
-Senior, Business Analytics & Information Systems
-University of Iowa — Tippie College of Business
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/john-kirima/)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=flat&logo=github&logoColor=white)](https://github.com/johnkirima)
-[![Portfolio](https://img.shields.io/badge/Portfolio-johnkirima.com-000000?style=flat&logo=vercel&logoColor=white)](https://www.johnkirima.com)
+- [ ] **Real-time monitoring** with automated daily scraping
+- [ ] **Predictive modeling** for churn risk
+- [ ] **Multi-language support** (Spanish, French)
+- [ ] **API deployment** for production use
+- [ ] **Email alerts** for critical reviews
+- [ ] **Advanced topic modeling** with LDA/BERT
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file
 
 ---
 
-<div align="center">
-<sub>Built with real data, real NLP, and real business questions.</sub>
-</div>
+## 👤 Author
+
+**John Kirima**  
+Data Scientist | NLP Specialist
+
+- GitHub: [@johnkirima](https://github.com/johnkirima)
+- LinkedIn: [John Kirima](https://linkedin.com/in/johnkirima)
+- Email: your.email@example.com
+
+---
+
+## 🙏 Acknowledgments
+
+- **Apps Analyzed**: Chime, Cash App, Venmo, PayPal, Zelle
+- **Data Source**: Google Play Store
+- **NLP Libraries**: VADER, NLTK, spaCy
+
+---
+
+**⭐ If you find this project useful, please star the repository!**
